@@ -1,0 +1,679 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VK Bible Quiz</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #172554, #3b0764);
+    min-height: 100vh;
+    color: #222;
+}
+
+.app {
+    width: 95%;
+    max-width: 650px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    font-size: 42px;
+    margin-bottom: 5px;
+}
+
+h1 {
+    margin: 5px 0;
+    color: #172554;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 15px;
+}
+
+.progress {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.question {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin: 25px 0;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin: 12px 0;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: #fafafa;
+    font-size: 17px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.option:hover {
+    background: #f0f0ff;
+    border-color: #6366f1;
+}
+
+.option.correct {
+    background: #dcfce7;
+    border-color: #16a34a;
+}
+
+.option.wrong {
+    background: #fee2e2;
+    border-color: #dc2626;
+}
+
+button {
+    font-family: Arial, sans-serif;
+}
+
+.next-btn,
+.restart-btn,
+.start-btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #172554;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.next-btn:hover,
+.restart-btn:hover,
+.start-btn:hover {
+    background: #312e81;
+}
+
+.timer {
+    text-align: center;
+    font-size: 18px;
+    color: #b91c1c;
+    font-weight: bold;
+}
+
+.result {
+    text-align: center;
+    display: none;
+}
+
+.score {
+    font-size: 55px;
+    font-weight: bold;
+    color: #172554;
+    margin: 20px;
+}
+
+.message {
+    font-size: 22px;
+    margin: 20px 0;
+}
+
+.home {
+    text-align: center;
+}
+
+.home p {
+    line-height: 1.6;
+    color: #555;
+}
+
+.hidden {
+    display: none;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: #888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HOME SCREEN -->
+
+    <div id="homeScreen" class="home">
+
+        <div class="logo">📖</div>
+
+        <h1>VK Bible Quiz</h1>
+
+        <div class="subtitle">
+            Test Your Bible Knowledge
+        </div>
+
+        <p>
+            Welcome to VK Bible Quiz!
+            Challenge yourself with questions
+            from the Holy Bible.
+        </p>
+
+        <p>
+            You will get 10 questions.
+            Choose the best answer for each question.
+        </p>
+
+        <button class="start-btn" onclick="startQuiz()">
+            Start Quiz
+        </button>
+
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+
+    <div id="quizScreen" class="hidden">
+
+        <div class="header">
+
+            <div class="logo">📖</div>
+
+            <h1>VK Bible Quiz</h1>
+
+        </div>
+
+        <div class="progress">
+
+            <span id="questionNumber">
+                Question 1 / 10
+            </span>
+
+            <span>
+                Score: <span id="score">0</span>
+            </span>
+
+        </div>
+
+        <div class="timer">
+            Time: <span id="timer">30</span> seconds
+        </div>
+
+        <div id="question" class="question"></div>
+
+        <div id="options"></div>
+
+        <button
+            id="nextButton"
+            class="next-btn"
+            onclick="nextQuestion()"
+            style="display:none;">
+            Next Question
+        </button>
+
+    </div>
+
+
+    <!-- RESULT SCREEN -->
+
+    <div id="resultScreen" class="result">
+
+        <div class="logo">🏆</div>
+
+        <h1>Quiz Completed!</h1>
+
+        <div class="score">
+            <span id="finalScore">0</span>/10
+        </div>
+
+        <div id="resultMessage" class="message"></div>
+
+        <button
+            class="restart-btn"
+            onclick="restartQuiz()">
+            Play Again
+        </button>
+
+    </div>
+
+
+    <div class="footer">
+        VK Bible Quiz © 2026
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==============================
+   BIBLE QUESTIONS
+   ============================== */
+
+const questions = [
+
+    {
+        question: "Who built the ark according to the Bible?",
+        options: [
+            "Abraham",
+            "Moses",
+            "Noah",
+            "David"
+        ],
+        answer: "Noah"
+    },
+
+    {
+        question: "Who was the first man created by God?",
+        options: [
+            "Adam",
+            "Abel",
+            "Noah",
+            "Moses"
+        ],
+        answer: "Adam"
+    },
+
+    {
+        question: "Who led the Israelites out of Egypt?",
+        options: [
+            "Joshua",
+            "Moses",
+            "David",
+            "Solomon"
+        ],
+        answer: "Moses"
+    },
+
+    {
+        question: "Who defeated Goliath?",
+        options: [
+            "Samson",
+            "David",
+            "Saul",
+            "Jonathan"
+        ],
+        answer: "David"
+    },
+
+    {
+        question: "Where was Jesus born?",
+        options: [
+            "Jerusalem",
+            "Nazareth",
+            "Bethlehem",
+            "Capernaum"
+        ],
+        answer: "Bethlehem"
+    },
+
+    {
+        question: "Who was the mother of Jesus?",
+        options: [
+            "Martha",
+            "Mary",
+            "Elizabeth",
+            "Ruth"
+        ],
+        answer: "Mary"
+    },
+
+    {
+        question: "How many disciples did Jesus choose?",
+        options: [
+            "10",
+            "11",
+            "12",
+            "13"
+        ],
+        answer: "12"
+    },
+
+    {
+        question: "Who betrayed Jesus?",
+        options: [
+            "Peter",
+            "John",
+            "Judas Iscariot",
+            "Thomas"
+        ],
+        answer: "Judas Iscariot"
+    },
+
+    {
+        question: "What is the first book of the Bible?",
+        options: [
+            "Exodus",
+            "Matthew",
+            "Genesis",
+            "Psalms"
+        ],
+        answer: "Genesis"
+    },
+
+    {
+        question: "What is the last book of the Bible?",
+        options: [
+            "Revelation",
+            "Acts",
+            "Jude",
+            "Malachi"
+        ],
+        answer: "Revelation"
+    }
+
+];
+
+
+/* ==============================
+   VARIABLES
+   ============================== */
+
+let currentQuestion = 0;
+
+let score = 0;
+
+let timeLeft = 30;
+
+let timer;
+
+
+/* ==============================
+   START QUIZ
+   ============================== */
+
+function startQuiz() {
+
+    currentQuestion = 0;
+
+    score = 0;
+
+    document.getElementById("homeScreen")
+        .classList.add("hidden");
+
+    document.getElementById("resultScreen")
+        .style.display = "none";
+
+    document.getElementById("quizScreen")
+        .classList.remove("hidden");
+
+    showQuestion();
+
+}
+
+
+/* ==============================
+   SHOW QUESTION
+   ============================== */
+
+function showQuestion() {
+
+    clearInterval(timer);
+
+    timeLeft = 30;
+
+    document.getElementById("timer")
+        .textContent = timeLeft;
+
+    timer = setInterval(function() {
+
+        timeLeft--;
+
+        document.getElementById("timer")
+            .textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            disableOptions();
+
+            document.getElementById("nextButton")
+                .style.display = "block";
+
+        }
+
+    }, 1000);
+
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber")
+        .textContent =
+        "Question " +
+        (currentQuestion + 1) +
+        " / " +
+        questions.length;
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("question")
+        .textContent = q.question;
+
+
+    const optionsDiv =
+        document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+
+    q.options.forEach(function(option) {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+
+        button.textContent = option;
+
+        button.onclick = function() {
+
+            checkAnswer(button, option);
+
+        };
+
+        optionsDiv.appendChild(button);
+
+    });
+
+
+    document.getElementById("nextButton")
+        .style.display = "none";
+
+}
+
+
+/* ==============================
+   CHECK ANSWER
+   ============================== */
+
+function checkAnswer(button, selectedAnswer) {
+
+    clearInterval(timer);
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+
+    const allOptions =
+        document.querySelectorAll(".option");
+
+    allOptions.forEach(function(option) {
+
+        option.disabled = true;
+
+        if (option.textContent === correctAnswer) {
+
+            option.classList.add("correct");
+
+        }
+
+    });
+
+
+    if (selectedAnswer === correctAnswer) {
+
+        score++;
+
+        button.classList.add("correct");
+
+    } else {
+
+        button.classList.add("wrong");
+
+    }
+
+
+    document.getElementById("score")
+        .textContent = score;
+
+    document.getElementById("nextButton")
+        .style.display = "block";
+
+}
+
+
+/* ==============================
+   DISABLE OPTIONS
+   ============================== */
+
+function disableOptions() {
+
+    const allOptions =
+        document.querySelectorAll(".option");
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+
+    allOptions.forEach(function(option) {
+
+        option.disabled = true;
+
+        if (option.textContent === correctAnswer) {
+
+            option.classList.add("correct");
+
+        }
+
+    });
+
+}
+
+
+/* ==============================
+   NEXT QUESTION
+   ============================== */
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+    if (currentQuestion >= questions.length) {
+
+        showResult();
+
+    } else {
+
+        showQuestion();
+
+    }
+
+}
+
+
+/* ==============================
+   SHOW RESULT
+   ============================== */
+
+function showResult() {
+
+    clearInterval(timer);
+
+    document.getElementById("quizScreen")
+        .classList.add("hidden");
+
+    document.getElementById("resultScreen")
+        .style.display = "block";
+
+    document.getElementById("finalScore")
+        .textContent = score;
+
+
+    let message = "";
+
+    if (score === 10) {
+
+        message =
+            "Excellent! You have a wonderful Bible knowledge!";
+
+    } else if (score >= 7) {
+
+        message =
+            "Great job! Keep studying the Bible!";
+
+    } else if (score >= 5) {
+
+        message =
+            "Good effort! Continue learning God's Word!";
+
+    } else {
+
+        message =
+            "Keep learning and growing in God's Word!";
+
+    }
+
+
+    document.getElementById("resultMessage")
+        .textContent = message;
+
+}
+
+
+/* ==============================
+   RESTART QUIZ
+   ============================== */
+
+function restartQuiz() {
+
+    document.getElementById("resultScreen")
+        .style.display = "none";
+
+    document.getElementById("homeScreen")
+        .classList.remove("hidden");
+
+}
+
+</script>
+
+</body>
+</html>
